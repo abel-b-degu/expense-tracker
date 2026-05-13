@@ -16,14 +16,15 @@ There is no test suite configured.
 
 ## Architecture
 
-This is a single-file React app — all logic and UI live in [src/App.jsx](src/App.jsx). There are no sub-components, routing, or external state management libraries.
+React + Vite app with no routing or external state management. `transactions` state lives in `App` and is passed down as props. There are no shared constants files — `categories` is duplicated in `TransactionForm` and `TransactionList`.
 
-**State shape in `App`:**
-- `transactions` — array of `{ id, description, amount, type, category, date }`. `amount` is stored as a string (not a number), which causes incorrect arithmetic in `totalIncome`, `totalExpenses`, and `balance` (known bug).
-- Form state: `description`, `amount`, `type`, `category` — controlled inputs for adding a new transaction.
-- Filter state: `filterType`, `filterCategory` — drive the visible subset of transactions.
+**Component breakdown:**
+- [src/App.jsx](src/App.jsx) — owns `transactions` state and `handleAdd`; renders the four child components.
+- [src/Summary.jsx](src/Summary.jsx) — receives `transactions`, computes `totalIncome`, `totalExpenses`, and `balance` internally.
+- [src/TransactionForm.jsx](src/TransactionForm.jsx) — owns its own form state (`description`, `amount`, `type`, `category`); calls `onAdd(transaction)` prop on submit.
+- [src/TransactionList.jsx](src/TransactionList.jsx) — owns filter state (`filterType`, `filterCategory`); receives `transactions` and renders the filtered table.
 
-**Known intentional issues (course material):**
-- `amount` stored as string → `reduce` concatenates instead of summing.
+**Transaction shape:** `{ id, description, amount, type, category, date }` — `amount` is a number, `type` is `"income"` or `"expense"`.
+
+**Known issue (course material):**
 - "Freelance Work" is categorized as `type: "expense"` despite being income.
-- UI styling is minimal/unstyled beyond [src/App.css](src/App.css).
